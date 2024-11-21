@@ -35,7 +35,6 @@ export type FileWithPreview = FileWithPath & {
   preview: string;
 };
 
-
 interface ProfileUserInputProps {
   email: string;
   image?: File; // Use File type instead of base64 string
@@ -43,14 +42,14 @@ interface ProfileUserInputProps {
 }
 
 const accept = {
-  "image/*": [ ".png", ".jpg", ".jpeg",  ],
+  "image/*": [".png", ".jpg", ".jpeg"],
 };
 
 const profileFormSchema = z.object({
   email: z.string().email({
     message: "Please enter a valid email address.",
   }),
-  image: z.instanceof(File).optional(), // Accept File or null
+  image: z.any().optional(), // Relaxing validation for the image
   name: z.string().min(2, {
     message: "Name must be at least 2 characters.",
   }),
@@ -60,15 +59,10 @@ type ProfileFormValues = z.infer<typeof profileFormSchema>;
 const usePatchUser = ({ userId }: { userId: string }) => {
   return useMutation({
     mutationKey: ["users"],
-    mutationFn: async (data: ProfileUserInputProps) => {
-      const formData = new FormData();
-      if (data.image) {
-        formData.append("image", data.image);
-      }
-      formData.append("email", data.email);
-      formData.append("name", data.name);
-
-      const res = await axiosInstance.patch(`/users/${userId}`, formData);
+    mutationFn: async (data: FormData) => {
+      const res = await axiosInstance.patch(`/users/${userId}`, data, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
       return res.data;
     },
     onMutate: () => {
@@ -119,15 +113,19 @@ export function EditProfileForm({ user }: { user: ProfileUser }) {
   const { mutate } = usePatchUser({ userId: user.id });
 
   function onSubmit(data: ProfileFormValues) {
-    const profileData: ProfileUserInputProps = {
-      email: data.email,
-      name: data.name,
-      image: selectedFile ?? undefined,
-    };
-
-    console.log(profileData)
-
-    mutate(profileData, {
+    if (!selectedFile) {
+      toast.error("Please select an image.");
+      return;
+    }
+  
+    
+  
+    const formData = new FormData();
+    formData.append("image", selectedFile); // Use `selectedFile`, not its preview or path
+    formData.append("email", data.email);
+    formData.append("name", data.name);
+  
+    mutate(formData, {
       onSuccess: () => {
         toast.success("Profile updated successfully");
         queryClient.invalidateQueries({ queryKey: ["users"] });

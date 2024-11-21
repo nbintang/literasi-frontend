@@ -26,7 +26,7 @@ export default function SigninPage() {
         <CardContent>
         <SignInForm />
           <div className="mt-6 text-center">
-            <Link href={"/signup"}>
+            <Link href={"/register"}>
               {" "}
               <Button className="text-muted-foreground" variant="link">
                 Don&apos;t have an account? Sign Up

@@ -1,6 +1,5 @@
 import axiosInstance from '@/lib/axios-instances';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
-import React from 'react'
 import toast from 'react-hot-toast';
 
 export default function useDeleteData({endpointOptions, tag}:{endpointOptions: string, tag : string;}) {
@@ -12,6 +11,7 @@ export default function useDeleteData({endpointOptions, tag}:{endpointOptions: s
           return res.data;
         },
         onSuccess: (data) => {
+          
           console.log(data);
           toast.success("Book created successfully");
           queryClient.invalidateQueries({ queryKey: [tag] });

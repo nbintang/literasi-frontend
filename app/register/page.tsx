@@ -1,6 +1,6 @@
 "use client";
 
-import { SignUpForm } from "@/components/auth-form/register";
+import SignUpForm from "@/components/auth-form/register";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -22,7 +22,7 @@ export default function SigninPage() {
         <CardContent>
           <SignUpForm />
           <div className="mt-6 text-center">
-            <Link href={"/signin"}>
+            <Link href={"/login"}>
               {" "}
               <Button className="text-muted-foreground" variant="link">Already have an account? Sign In</Button>
             </Link>
